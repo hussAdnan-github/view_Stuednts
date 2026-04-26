@@ -81,7 +81,7 @@ const gradeMapping = {
                     <label className="text-sm font-medium">ساعات الدراسة الأسبوعية ({formData.StudyTimeWeekly})</label>
                     <input type="range" name="StudyTimeWeekly" min="0" max="20" step="0.5" value={formData.StudyTimeWeekly} onChange={handleChange} className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
                   </div>
-                  <InputNumber label="عدد مرات الغياب" name="Absences" value={formData.Absences} onChange={handleChange} max={30} />
+                  <InputNumber label="عدد مرات الغياب (أعلى غياب 30)" name="Absences" value={formData.Absences} onChange={handleChange} max={30} />
                   <InputSelect label="دعم الوالدين" name="ParentalSupport" value={formData.ParentalSupport} onChange={handleChange} options={{0:'منعدم', 1:'منخفض', 2:'متوسط', 3:'عالي', 4:'ممتاز'}} />
                   <InputSelect label="دروس خصوصية" name="Tutoring" value={formData.Tutoring} onChange={handleChange} options={{0:'لا', 1:'نعم'}} />
                 </div>
