@@ -33,7 +33,7 @@ const gradeMapping = {
   setLoading(true);
   try {
     // 1. استخدام POST بدلاً من GET
-    const response = await axios.post('http://127.0.0.1:8000/predict', formData);
+    const response = await axios.post('https://student-performance-ead0.onrender.com/predict', formData);
     
     // 2. الوصول للمفتاح الصحيح (prediction) الذي حددناه في FastAPI
     setPrediction(response.data.prediction); 
