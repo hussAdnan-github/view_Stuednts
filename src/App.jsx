@@ -69,7 +69,7 @@ const gradeMapping = {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <InputSelect label="العمر" name="Age" value={formData.Age} onChange={handleChange} options={[15,16,17,18]} />
                   <InputSelect label="الجنس" name="Gender" value={formData.Gender} onChange={handleChange} options={{0: 'ذكر', 1: 'أنثى'}} />
-                  <InputSelect label="العرق" name="Ethnicity" value={formData.Ethnicity} onChange={handleChange} options={{0: 'قوقازي', 1: 'أفريقي', 2: 'آسيوي', 3: 'آخر'}} />
+                  <InputSelect label="العرق" name="Ethnicity" value={formData.Ethnicity} onChange={handleChange} options={{0: 'أوروبي', 1: 'أفريقي', 2: 'آسيوي', 3: 'آخر'}} />
                   <InputSelect label="تعليم الوالدين" name="ParentalEducation" value={formData.ParentalEducation} onChange={handleChange} options={{0:'لا يوجد', 1:'ثانوي', 2:'جامعي جزئي', 3:'بكالوريوس', 4:'أعلى'}} />
                 </div>
               </Card>
