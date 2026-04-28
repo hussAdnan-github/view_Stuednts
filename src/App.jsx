@@ -65,7 +65,7 @@ const gradeMapping = {
             <form onSubmit={handleSubmit} className="space-y-6">
               
               {/* القسم الأول: معلومات الطالب */}
-              <Card title="المعلومات الديموغرافية" icon={<User className="text-blue-500" />}>
+              <Card title="المعلومات العامة" icon={<User className="text-blue-500" />}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <InputSelect label="العمر" name="Age" value={formData.Age} onChange={handleChange} options={[15,16,17,18]} />
                   <InputSelect label="الجنس" name="Gender" value={formData.Gender} onChange={handleChange} options={{0: 'ذكر', 1: 'أنثى'}} />
@@ -88,7 +88,7 @@ const gradeMapping = {
               </Card>
 
               {/* القسم الثالث: الأنشطة */}
-              <Card title="الأنشطة الموازية" icon={<Activity className="text-orange-500" />}>
+              <Card title="الأنشطة" icon={<Activity className="text-orange-500" />}>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <ToggleButton label="رياضة" name="Sports" value={formData.Sports} onClick={handleChange} />
                   <ToggleButton label="موسيقى" name="Music" value={formData.Music} onClick={handleChange} />
