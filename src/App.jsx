@@ -1,192 +1,201 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  User, BookOpen, Activity, GraduationCap, 
-  Clock, AlertCircle, CheckCircle2, ChevronRight 
-} from 'lucide-react';
+import { Home, MapPin, Users, DollarSign, Waves, Loader2, CheckCircle2 } from 'lucide-react';
 
-const App = () => {
+function App() {
   const [formData, setFormData] = useState({
-    Age: 16, Gender: 0, Ethnicity: 0, ParentalEducation: 1,
-    StudyTimeWeekly: 10, Absences: 0, Tutoring: 0,
-    ParentalSupport: 2, Extracurricular: 0, Sports: 0,
-    Music: 0, Volunteering: 0
+    longitude: -122.23,
+    latitude: 37.88,
+    housing_median_age: 41,
+    total_rooms: 880,
+    total_bedrooms: 129,
+    population: 322,
+    households: 126,
+    median_income: 8.32,
+    ocean_proximity: 'NEAR BAY'
   });
-const gradeMapping = {
-  "0": "A (ممتاز)",
-  "1": "B (جيد جداً)",
-  "2": "C (جيد)",
-  "3": "D (مقبول)",
-  "4": "F (راسب)"
-};
+
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-   setFormData(prev => ({ ...prev, [name]: Number(value) }));
+    setFormData({
+      ...formData,
+      [name]: name === 'ocean_proximity' ? value : parseFloat(value)
+    });
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  try {
-    // 1. استخدام POST بدلاً من GET
-    const response = await axios.post('https://student-performance-ead0.onrender.com/predict', formData);
-    
-    // 2. الوصول للمفتاح الصحيح (prediction) الذي حددناه في FastAPI
-    setPrediction(response.data.prediction); 
-    
-  } catch (error) {
-    console.error("خطأ في الاتصال بالخادم", error);
-    alert("فشل في جلب النتيجة من الخادم");
-  }
-  setLoading(false);
-};
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.post('https://house-regression.onrender.com/predict', formData);
+      setPrediction(response.data.prediction);
+    } catch (err) {
+      setError("فشل الاتصال بالخادم. تأكد من تشغيل الـ API.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 dir-rtl" dir="rtl">
+    <div className="min-h-screen bg-slate-50 font-sans text-right" dir="rtl">
       {/* Header */}
-      <header className="bg-white border-b py-6 px-4 mb-8">
-        <div className="max-w-5xl mx-auto flex items-center gap-3">
-          <div className="bg-blue-600 p-2 rounded-lg text-white">
-            <GraduationCap size={32} />
+      <header className="bg-blue-700 text-white py-8 shadow-lg">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center gap-3">
+            <Home size={32} />
+            <h1 className="text-3xl font-bold">نظام التنبؤ بأسعار المنازل</h1>
           </div>
-          <h1 className="text-2xl font-bold text-slate-800">نظام EduPredict للتنبؤ بالأداء الأكاديمي</h1>
+          <p className="text-center mt-2 text-blue-100">أدخل بيانات المنطقة للحصول على السعر التقديري للمنزل</p>
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 pb-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <main className="container mx-auto px-4 py-10">
+        <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           {/* Form Section */}
-          <div className="lg:col-span-2">
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
-              {/* القسم الأول: معلومات الطالب */}
-              <Card title="المعلومات الديموغرافية" icon={<User className="text-blue-500" />}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <InputSelect label="العمر" name="Age" value={formData.Age} onChange={handleChange} options={[15,16,17,18]} />
-                  <InputSelect label="الجنس" name="Gender" value={formData.Gender} onChange={handleChange} options={{0: 'ذكر', 1: 'أنثى'}} />
-                  <InputSelect label="العرق" name="Ethnicity" value={formData.Ethnicity} onChange={handleChange} options={{0: 'قوقازي', 1: 'أفريقي', 2: 'آسيوي', 3: 'آخر'}} />
-                  <InputSelect label="تعليم الوالدين" name="ParentalEducation" value={formData.ParentalEducation} onChange={handleChange} options={{0:'لا يوجد', 1:'ثانوي', 2:'جامعي جزئي', 3:'بكالوريوس', 4:'أعلى'}} />
-                </div>
-              </Card>
+              {/* Location Data */}
+              <div className="md:col-span-2 border-b pb-2 mb-2">
+                <h2 className="text-lg font-semibold text-slate-700 flex items-center gap-2">
+                  <MapPin size={20} className="text-blue-600" /> البيانات الجغرافية
+                </h2>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-slate-600 mb-1">خطي الطول (Longitude)</label>
+                <input type="number" step="any" name="longitude" value={formData.longitude} onChange={handleChange} className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required />
+              </div>
 
-              {/* القسم الثاني: العادات الدراسية */}
-              <Card title="العادات الدراسية" icon={<BookOpen className="text-emerald-500" />}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">ساعات الدراسة الأسبوعية ({formData.StudyTimeWeekly})</label>
-                    <input type="range" name="StudyTimeWeekly" min="0" max="20" step="0.5" value={formData.StudyTimeWeekly} onChange={handleChange} className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
-                  </div>
-                  <InputNumber label="عدد مرات الغياب" name="Absences" value={formData.Absences} onChange={handleChange} max={30} />
-                  <InputSelect label="دعم الوالدين" name="ParentalSupport" value={formData.ParentalSupport} onChange={handleChange} options={{0:'منعدم', 1:'منخفض', 2:'متوسط', 3:'عالي', 4:'ممتاز'}} />
-                  <InputSelect label="دروس خصوصية" name="Tutoring" value={formData.Tutoring} onChange={handleChange} options={{0:'لا', 1:'نعم'}} />
-                </div>
-              </Card>
+              <div>
+                <label className="block text-sm font-medium text-slate-600 mb-1">دائرة العرض (Latitude)</label>
+                <input type="number" step="any" name="latitude" value={formData.latitude} onChange={handleChange} className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required />
+              </div>
 
-              {/* القسم الثالث: الأنشطة */}
-              <Card title="الأنشطة الموازية" icon={<Activity className="text-orange-500" />}>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <ToggleButton label="رياضة" name="Sports" value={formData.Sports} onClick={handleChange} />
-                  <ToggleButton label="موسيقى" name="Music" value={formData.Music} onClick={handleChange} />
-                  <ToggleButton label="تطوع" name="Volunteering" value={formData.Volunteering} onClick={handleChange} />
-                  <ToggleButton label="أنشطة أخرى" name="Extracurricular" value={formData.Extracurricular} onClick={handleChange} />
-                </div>
-              </Card>
+              {/* House Data */}
+              <div className="md:col-span-2 border-b pb-2 mb-2 mt-4">
+                <h2 className="text-lg font-semibold text-slate-700 flex items-center gap-2">
+                  <Home size={20} className="text-green-600" /> تفاصيل العقارات
+                </h2>
+              </div>
 
-              <button 
-                type="submit" 
-                disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-2"
-              >
-                {loading ? <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : "تحليل النتيجة المتوقعة"}
-              </button>
+              <div>
+                <label className="block text-sm font-medium text-slate-600 mb-1">متوسط عمر البناء</label>
+                <input type="number" min="0" max="100" name="housing_median_age" value={formData.housing_median_age} onChange={handleChange} className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-600 mb-1">إجمالي الغرف</label>
+                <input type="number" min="0" max="10000" name="total_rooms" value={formData.total_rooms} onChange={handleChange} className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-600 mb-1">إجمالي غرف النوم</label>
+                <input type="number" min="0" max="5000" name="total_bedrooms" value={formData.total_bedrooms} onChange={handleChange} className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-600 mb-1">القرب من المحيط</label>
+                <select name="ocean_proximity" value={formData.ocean_proximity} onChange={handleChange} className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                  <option value="<1H OCEAN">أقل من ساعة واحدة في المحيط</option>
+                  <option value="INLAND">داخلي</option>
+                  <option value="NEAR OCEAN">بالقرب من المحيط</option>
+                  <option value="NEAR BAY">بالقرب من الخليج</option>
+                  <option value="ISLAND">جزيرة</option>
+                </select>
+              </div>
+
+              {/* Socio-economic Data */}
+              <div className="md:col-span-2 border-b pb-2 mb-2 mt-4">
+                <h2 className="text-lg font-semibold text-slate-700 flex items-center gap-2">
+                  <Users size={20} className="text-purple-600" /> السكان والدخل
+                </h2>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-600 mb-1">عدد السكان</label>
+                <input type="number" name="population" value={formData.population} onChange={handleChange} className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-600 mb-1">عدد الأسر (Households)</label>
+                <input type="number" name="households" value={formData.households} onChange={handleChange} className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-600 mb-1">متوسط الدخل (بالآلاف)</label>
+                <input type="number" step="any" name="median_income" value={formData.median_income} onChange={handleChange} className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required />
+              </div>
+
+              <div className="md:col-span-2 mt-6">
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md disabled:bg-blue-400"
+                >
+                  {loading ? <Loader2 className="animate-spin" /> : "تحليل وتوقع السعر"}
+                </button>
+              </div>
             </form>
           </div>
 
-          {/* Result Section */}
+          {/* Results Section */}
           <div className="lg:col-span-1">
-            <div className="sticky top-8">
-              <AnimatePresence mode="wait">
-                {!prediction ? (
-                  <motion.div 
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                    className="bg-white p-8 rounded-2xl border-2 border-dashed border-slate-200 text-center text-slate-400"
-                  >
-                    <Clock size={48} className="mx-auto mb-4 opacity-20" />
-                    <p>قم بتعبئة البيانات والضغط على زر التحليل لعرض النتائج</p>
-                  </motion.div>
-                ) : (
-                  <motion.div 
-                    initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                    className="bg-white p-8 rounded-2xl shadow-xl border border-blue-100 text-center"
-                  >
-                    <CheckCircle2 size={64} className="mx-auto mb-4 text-emerald-500" />
-                    <h3 className="text-xl font-bold text-slate-700 mb-2">النتيجة المتوقعة:</h3>
-                    <div className="text-3xl font-black text-blue-600 p-4 bg-blue-50 rounded-xl mb-6">
-                     {gradeMapping[prediction] || prediction}
-                    </div>
-                    <div className="text-right space-y-3">
-                      <div className="text-sm text-slate-500 flex items-center gap-2">
-                        <AlertCircle size={16} />
-                        نصيحة: زيادة ساعات الدراسة قد ترفع التقدير.
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 sticky top-8">
+              <h2 className="text-xl font-bold text-slate-800 mb-6 text-center">النتيجة المتوقعة</h2>
+              
+              {!prediction && !loading && !error && (
+                <div className="text-center py-10">
+                  <div className="bg-slate-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                    <DollarSign size={40} className="text-slate-400" />
+                  </div>
+                  <p className="text-slate-500">أدخل البيانات واضغط على توقع لعرض السعر هنا</p>
+                </div>
+              )}
+
+              {loading && (
+                <div className="text-center py-10">
+                  <Loader2 size={48} className="animate-spin text-blue-600 mx-auto mb-4" />
+                  <p className="text-slate-600 font-medium">جاري معالجة البيانات...</p>
+                </div>
+              )}
+
+              {prediction && !loading && (
+                <div className="text-center animate-fade-in">
+                  <div className="bg-green-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle2 size={40} className="text-green-600" />
+                  </div>
+                  <p className="text-slate-500 mb-2 font-medium">السعر التقديري للمنزل:</p>
+                  <div className="text-4xl font-black text-slate-900 mb-2">
+                    ${prediction.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                  </div>
+                  <div className="inline-block px-4 py-1 bg-green-50 text-green-700 rounded-full text-sm font-semibold border border-green-200">
+                    تم التنبؤ بنجاح
+                  </div>
+                </div>
+              )}
+
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg text-sm text-center">
+                  {error}
+                </div>
+              )}
             </div>
           </div>
+
         </div>
       </main>
+      
+       
     </div>
   );
-};
-
-// مكونات صغيرة (Sub-components) لتحسين نظافة الكود
-const Card = ({ title, icon, children }) => (
-  <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-    <div className="flex items-center gap-2 mb-6 border-b pb-4">
-      {icon}
-      <h2 className="font-bold text-slate-700">{title}</h2>
-    </div>
-    {children}
-  </div>
-);
-
-const InputSelect = ({ label, name, value, onChange, options }) => (
-  <div className="space-y-2">
-    <label className="text-sm font-medium text-slate-600">{label}</label>
-    <select name={name} value={value} onChange={onChange} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-      {Array.isArray(options) 
-        ? options.map(opt => <option key={opt} value={opt}>{opt}</option>)
-        : Object.entries(options).map(([val, text]) => <option key={val} value={val}>{text}</option>)
-      }
-    </select>
-  </div>
-);
-
-const InputNumber = ({ label, name, value, onChange, max }) => (
-  <div className="space-y-2">
-    <label className="text-sm font-medium text-slate-600">{label}</label>
-    <input type="number" name={name} value={value} onChange={onChange} min="0" max={max} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
-  </div>
-);
-
-const ToggleButton = ({ label, name, value, onClick }) => (
-  <button
-    type="button"
-    onClick={() => onClick({ target: { name, value: value === 1 ? 0 : 1 } })}
-    className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
-      value === 1 ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-100 bg-slate-50 text-slate-400'
-    }`}
-  >
-    <div className={`w-4 h-4 rounded-full ${value === 1 ? 'bg-blue-500' : 'bg-slate-300'}`} />
-    <span className="text-xs font-bold">{label}</span>
-  </button>
-);
+}
 
 export default App;
